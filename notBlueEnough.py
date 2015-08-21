@@ -1,6 +1,7 @@
 import sys;
 import os;
 from PIL import Image;
+import itertools;
 
 """
 Batch-process all images in a directory, replacing all pixels of the of the offending color.
@@ -13,16 +14,16 @@ splat args = space-delimited list of hex values to replace (w/o the #s)
 """
 
 
-def main(dir, new, *args):
+def main(null, dir, new, *args):
     rootDir = dir
+    print(args)
     if os.path.exists(rootDir+'/out'): 
         pass
     else:
         os.mkdir(rootDir+'/out')
     new = bluify(new)
-    old = []
-    for i in args:
-        old.append(bluify(i))
+    old = [bluify(x) for x in args]
+    print(old)
     for dirName, subdirList, fileList in os.walk(rootDir):
         for fname in fileList:
             im = Image.open(rootDir+'/'+fname) 
@@ -47,10 +48,10 @@ def main(dir, new, *args):
 def bluify(thing):
     a = int(thing[:2], 16)
     b = int(thing[2:4], 16)
-    c = int(thing[4:], 16)
+    c = int(thing[4:6], 16)
     return (a, b, c)
     
     
     
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2], sys.argv[3])
+    main(*sys.argv)
