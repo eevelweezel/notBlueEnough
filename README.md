@@ -1,11 +1,14 @@
 # notBlueEnough
-Because there are times blue isn't blue enough.  In 2k+ files. 
+Because there are times blue isn't blue enough.  Sometimes in 2k+ files. 
 
-Batch-processes all images in a directory, replacing all pixels of the of the offending color.
-Writes output to a subdirectory named "out."
+This thing batch-updates all images in a directory, replacing all pixels of the of the offending color, adjusting the gradient as needed.  Because marketing.  The quality of the output will depend on the size of the gradient and the relative similarity of the colors you're replacing.
+
+It should preserve transperancy, but doesn't do so well with .GIFs.  For now.  Output is saved to a subdirectory named "out."  
 
 dir = input directory
 
 new = hex value (w/o the #) of the replacement color
 
-splat args = space-delimited list of hex values to replace (w/o the #s)
+rep = hex value of the color to be replaced (w/o the #s)
+
+fuzz = size of the gradient, e.g. "100"
