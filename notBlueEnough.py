@@ -1,11 +1,9 @@
 import sys;
 import os;
 from PIL import Image;
-
-
 """
 Batch-update images in a directory, replacing all pixels of the of the offending color and an adjustable gradient.
-Because marketing.  It does preserve transperancy, but doesn't do so well with .GIFs.  Yet.
+Because marketing.  It preserves transperancy and does ...ok... withh GIFs.
 Writes output to a subdirectory named "out."
 
 dir = input directory
@@ -14,7 +12,6 @@ rep = hex value of the color to be replaced (w/o the #s)
 fuzz = size of the gradient.
 
 """
-
 def main(null, dir, new, rep, fuzz):
     rootDir = dir
     n = int(fuzz)
@@ -26,22 +23,46 @@ def main(null, dir, new, rep, fuzz):
     old = bluify(rep)
     for dirName, subdirList, fileList in os.walk(rootDir):
         for fname in fileList:
-            im = Image.open(rootDir+'/'+fname) 
-            pixel = im.load()
-            width, height = im.size
-            for x in range(width):
-                for y in range(height):
-                    if type(pixel[x,y]) != int:  
-                        try:                    
-                            if len(pixel[x,y]) == 3:
-                                r,g,b = pixel[x,y]
-                            else: 
-                                r,g,b,a = pixel[x,y]  
-                            if r in range(old[0]-n,old[0]+n) and g in range(old[1]-n,old[1]+n) and b in range(old[2]-n,old[2]+n):
-                                offset = (r-old[0],g-old[1],b-old[2])
-                                pixel[x,y] = (new[0]-offset[0],new[1]-offset[1],new[2]-offset[2],a)
-                        except TypeError:
-                            print('Some kinda type weirdness: '+fname)                              
+            try:
+                im = Image.open(rootDir+'/'+fname) 
+            except IOError:
+                print(fname + ' has issues.')   
+            if im.format == 'GIF':
+                im = im.convert('RGBA')
+                pixel = im.load()
+                width, height = im.size
+                for x in range(width):
+                    for y in range(height):
+                        if type(pixel[x,y]) != int:  
+                            try:                    
+                                if len(pixel[x,y]) == 3:
+                                    r,g,b = pixel[x,y]
+                                else: 
+                                    r,g,b,a = pixel[x,y]
+                                off = offset(old,n)         
+                                if r in range(off[0][0],off[0][1]) and g in range(off[1][0],off[1][1]) and b in range(off[2][0],off[2][1]):
+                                    diff = (r-old[0],g-old[1],b-old[2])
+                                    pixel[x,y] = (new[0]-diff[0],new[1]-diff[1],new[2]-diff[2],a)
+                            except TypeError:
+                                print('Some kinda type weirdness: '+fname)        
+            else:
+                pixel = im.load()
+                width, height = im.size
+                for x in range(width):
+                    for y in range(height):
+                        if type(pixel[x,y]) != int:  
+                            try:                    
+                                if len(pixel[x,y]) == 3:
+                                    r,g,b = pixel[x,y]
+                                else: 
+                                    r,g,b,a = pixel[x,y]
+                                off = offset(old,n)         
+                                if r in range(off[0][0],off[0][1]) and g in range(off[1][0],off[1][1]) and b in range(off[2][0],off[2][1]):
+                                    diff = (r-old[0],g-old[1],b-old[2])
+                                    pixel[x,y] = (new[0]-diff[0],new[1]-diff[1],new[2]-diff[2],a)
+                            except TypeError:
+                                print('Some kinda type weirdness: '+fname)
+                            
             im.save(rootDir+'/out/'+fname) 
     return
     
@@ -52,6 +73,28 @@ def bluify(thing):
     c = int(thing[4:6], 16)
     return (a, b, c)
     
+def offset(nold, fuzz):
+    out = []
+    for i in nold:
+        a = i - fuzz
+        b = i + fuzz
+        if a < 0:
+            a = 0
+        elif a > 255:
+            a = 255
+        else:
+            pass
+        if b < 0:
+            b = 0
+        elif b > 255:
+            b = 255
+        else:
+            pass
+        tmp = []
+        tmp.append(a)
+        tmp.append(b)        
+        out.append(tmp)            
+    return (out)
     
 if __name__ == '__main__':
     main(*sys.argv)
