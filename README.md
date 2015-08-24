@@ -3,7 +3,7 @@ Because there are times blue isn't blue enough.  Sometimes in 2k+ files.
 
 This thing batch-updates all images in a directory, replacing all pixels of the of the offending color, adjusting the gradient as needed.  Because marketing.  The quality of the output will depend on the size of the gradient and the relative similarity of the colors you're replacing.
 
-It should preserve transperancy, but doesn't do so well with .GIFs.  For now.  Output is saved to a subdirectory named "out."  
+It should preserve transperancy and at least make an effort with GIFs.  Output is saved to a subdirectory named "out."  
 
 dir = input directory
 
